@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SelectionScreen from './components/SelectionScreen';
 import UploadScreen from './components/UploadScreen';
 import PreviewScreen from './components/PreviewScreen';
 import Header from './components/Header';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import AudioProcessor from './utils/audioProcessor';
 
-function App() {
+// Protected Route Component
+function ProtectedRoute({ children }) {
+  const { currentUser } = useAuth();
+  return currentUser ? children : <Navigate to="/login" />;
+}
+
+// Main App Component
+function AppContent() {
   const [appState, setAppState] = useState('selection'); // 'selection', 'upload', 'preview'
   const [selectedTier, setSelectedTier] = useState(null); // 'basic' or 'premium'
   const [uploadedFile, setUploadedFile] = useState(null);
   const [processedAudio, setProcessedAudio] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track if user is signed in
-  const [user, setUser] = useState(null); // User data when signed in
+  const { currentUser } = useAuth(); // Get current user from Firebase
   const [userSubscription, setUserSubscription] = useState({
     tier: 'free', // 'free', 'basic', 'premium'
     freeDownloadsUsed: 0, // Track free downloads used
@@ -399,10 +409,10 @@ function App() {
     }}>
       <Header 
         userSubscription={userSubscription} 
-        isAuthenticated={isAuthenticated}
-        user={user}
-        onSignUp={handleSignUp}
-        onSignOut={handleSignOut}
+        isAuthenticated={!!currentUser}
+        user={currentUser}
+        onSignUp={() => {}} // Will be handled by routing
+        onSignOut={() => {}} // Will be handled by auth context
       />
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 16px', paddingBottom: shouldShowBanner() ? '120px' : '32px' }}>
         {renderCurrentScreen()}
@@ -411,6 +421,29 @@ function App() {
         <ConversionBanner />
       </div>
     </div>
+  );
+}
+
+// Main App Component with Router and Auth Provider
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <AppContent />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
