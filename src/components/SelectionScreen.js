@@ -1,8 +1,8 @@
 import React from 'react';
-import { Droplet, Star, User, Crown, Gift } from 'lucide-react';
+import { Crown, Gift, Zap } from 'lucide-react';
 import Logo from './Logo';
 
-const SelectionScreen = ({ onTierSelect }) => {
+const SelectionScreen = ({ onTierSelect, hidePricing = false }) => {
   // Define tier-specific colors
   const tierColors = {
     free: {
@@ -33,13 +33,13 @@ const SelectionScreen = ({ onTierSelect }) => {
       </div>
       
       {/* Hero Section */}
-      <h1 style={{ fontSize: '48px', fontWeight: 'bold', color: 'white', marginBottom: '24px' }}>
-        Instantly Perfect Your Audio. Unlimited Master. One Low Price.
+      <h1 style={{ fontSize: '56px', fontWeight: 'bold', color: 'white', marginBottom: '32px', lineHeight: '1.1' }}>
+        Instantly Perfect Your Audio
       </h1>
       
       {/* Subheading */}
-      <h2 style={{ fontSize: '20px', color: '#d1d5db', marginBottom: '32px' }}>
-        Upload your track to experience the power of AI mastering. Start for free.
+      <h2 style={{ fontSize: '36px', fontWeight: 'bold', color: '#d1d5db', marginBottom: '48px' }}>
+        Choose Your Processing Level
       </h2>
       
       {/* Call-to-Action Button */}
@@ -64,133 +64,147 @@ const SelectionScreen = ({ onTierSelect }) => {
       </button>
       
       {/* Subscription Tiers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Free Tier */}
-        <div 
-          onClick={() => onTierSelect('free')}
-          style={{ backgroundColor: '#1f2937', border: `1px solid ${tierColors.free.border}`, borderRadius: '12px', padding: '32px', cursor: 'pointer', transition: 'all 0.3s ease' }}
-          onMouseEnter={(e) => { e.target.style.borderColor = tierColors.free.primary; e.target.style.boxShadow = `0 10px 15px -3px rgba(96, 165, 250, 0.2)`; }}
-          onMouseLeave={(e) => { e.target.style.borderColor = tierColors.free.border; e.target.style.boxShadow = 'none'; }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ width: '64px', height: '64px', backgroundColor: tierColors.free.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Gift style={{ width: '32px', height: '32px', color: 'white' }} />
-            </div>
-          </div>
-          
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '16px' }}>Free Tier</h3>
-          
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.free.primary, marginBottom: '16px' }}>$0</div>
-          
-          <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
-            <li style={{ marginBottom: '8px' }}>• Unlimited Previews</li>
-            <li style={{ marginBottom: '8px' }}>• 1 Free Basic Download</li>
-            <li style={{ marginBottom: '8px' }}>• Basic Features</li>
-          </ul>
-          
-          <button style={{
-            backgroundColor: tierColors.free.primary,
-            color: 'white',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            width: '100%',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => { e.target.style.backgroundColor = tierColors.free.secondary; }}
-          onMouseLeave={(e) => { e.target.style.backgroundColor = tierColors.free.primary; }}
+      <div style={{ display: 'grid', gridTemplateColumns: hidePricing ? '1fr 1fr' : '1fr 1fr 1fr', gap: '24px', maxWidth: hidePricing ? '800px' : '1200px', margin: '0 auto' }}>
+        {/* Show Free Tier only when pricing is not hidden */}
+        {!hidePricing && (
+          <div 
+            onClick={() => onTierSelect('free')}
+            style={{ backgroundColor: '#1f2937', border: `1px solid ${tierColors.free.border}`, borderRadius: '12px', padding: '32px', cursor: 'pointer', transition: 'all 0.3s ease' }}
+            onMouseEnter={(e) => { e.target.style.borderColor = tierColors.free.primary; e.target.style.boxShadow = `0 10px 15px -3px rgba(96, 165, 250, 0.2)`; }}
+            onMouseLeave={(e) => { e.target.style.borderColor = tierColors.free.border; e.target.style.boxShadow = 'none'; }}
           >
-            Start for Free
-          </button>
-        </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+              <div style={{ width: '64px', height: '64px', backgroundColor: tierColors.free.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Gift style={{ width: '32px', height: '32px', color: 'white' }} />
+              </div>
+            </div>
+            
+            <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '16px' }}>Free Tier</h3>
+            
+            <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.free.primary, marginBottom: '16px' }}>$0</div>
+            
+            <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
+              <li style={{ marginBottom: '8px' }}>• Unlimited Previews</li>
+              <li style={{ marginBottom: '8px' }}>• 1 Free Basic Download</li>
+              <li style={{ marginBottom: '8px' }}>• Basic Features</li>
+            </ul>
+            
+            <button style={{
+              backgroundColor: tierColors.free.primary,
+              color: 'white',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => { e.target.style.backgroundColor = tierColors.free.secondary; }}
+            onMouseLeave={(e) => { e.target.style.backgroundColor = tierColors.free.primary; }}
+            >
+              Start for Free
+            </button>
+          </div>
+        )}
         
         {/* Basic Tier */}
         <div 
           onClick={() => onTierSelect('basic')}
-          style={{ backgroundColor: '#1f2937', border: `1px solid ${tierColors.basic.border}`, borderRadius: '12px', padding: '32px', cursor: 'pointer', transition: 'all 0.3s ease' }}
+          style={{ backgroundColor: '#1f2937', border: `1px solid ${tierColors.basic.border}`, borderRadius: '12px', padding: hidePricing ? '48px 32px' : '32px', cursor: 'pointer', transition: 'all 0.3s ease', textAlign: 'center' }}
           onMouseEnter={(e) => { e.target.style.borderColor = tierColors.basic.primary; e.target.style.boxShadow = `0 10px 15px -3px rgba(16, 185, 129, 0.2)`; }}
           onMouseLeave={(e) => { e.target.style.borderColor = tierColors.basic.border; e.target.style.boxShadow = 'none'; }}
         >
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ width: '64px', height: '64px', backgroundColor: tierColors.basic.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Droplet style={{ width: '32px', height: '32px', color: 'white' }} />
-            </div>
-          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: hidePricing ? '32px' : '24px' }}>
+             <div style={{ width: hidePricing ? '80px' : '64px', height: hidePricing ? '80px' : '64px', backgroundColor: tierColors.basic.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <Zap style={{ width: hidePricing ? '40px' : '32px', height: hidePricing ? '40px' : '32px', color: 'white' }} />
+             </div>
+           </div>
           
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '16px' }}>Basic Unlimited</h3>
+          <h3 style={{ fontSize: hidePricing ? '36px' : '24px', fontWeight: 'bold', color: 'white', marginBottom: hidePricing ? '32px' : '16px' }}>{hidePricing ? 'Basic' : 'Basic Unlimited'}</h3>
           
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.basic.primary, marginBottom: '16px' }}>$10<span style={{ fontSize: '16px', fontWeight: 'normal', color: '#d1d5db' }}>/month</span></div>
-          
-          <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
-            <li style={{ marginBottom: '8px' }}>• Unlimited Basic Masters</li>
-            <li style={{ marginBottom: '8px' }}>• High-Quality WAV & FLAC Downloads</li>
-            <li style={{ marginBottom: '8px' }}>• Priority Processing</li>
-          </ul>
+          {!hidePricing && (
+            <>
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.basic.primary, marginBottom: '16px' }}>$10<span style={{ fontSize: '16px', fontWeight: 'normal', color: '#d1d5db' }}>/month</span></div>
+              
+              <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
+                <li style={{ marginBottom: '8px' }}>• Unlimited Basic Masters</li>
+                <li style={{ marginBottom: '8px' }}>• High-Quality WAV & FLAC Downloads</li>
+                <li style={{ marginBottom: '8px' }}>• Priority Processing</li>
+              </ul>
+            </>
+          )}
           
           <button style={{
             backgroundColor: tierColors.basic.primary,
             color: 'white',
             border: 'none',
-            padding: '12px 24px',
+            padding: hidePricing ? '16px 32px' : '12px 24px',
             borderRadius: '8px',
             fontWeight: '600',
             cursor: 'pointer',
             width: '100%',
+            fontSize: hidePricing ? '24px' : '16px',
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => { e.target.style.backgroundColor = tierColors.basic.secondary; }}
           onMouseLeave={(e) => { e.target.style.backgroundColor = tierColors.basic.primary; }}
           >
-            Subscribe Now
+            {hidePricing ? 'Select Basic' : 'Subscribe Now'}
           </button>
         </div>
         
         {/* Premium Tier */}
         <div 
           onClick={() => onTierSelect('premium')}
-          style={{ backgroundColor: '#1f2937', border: `2px solid ${tierColors.premium.primary}`, borderRadius: '12px', padding: '32px', cursor: 'pointer', transition: 'all 0.3s ease', position: 'relative', overflow: 'hidden' }}
+          style={{ backgroundColor: '#1f2937', border: `2px solid ${tierColors.premium.primary}`, borderRadius: '12px', padding: hidePricing ? '48px 32px' : '32px', cursor: 'pointer', transition: 'all 0.3s ease', position: 'relative', overflow: 'hidden', textAlign: 'center' }}
           onMouseEnter={(e) => { e.target.style.borderColor = tierColors.premium.secondary; e.target.style.boxShadow = `0 10px 15px -3px rgba(245, 158, 11, 0.3)`; }}
           onMouseLeave={(e) => { e.target.style.borderColor = tierColors.premium.primary; e.target.style.boxShadow = 'none'; }}
         >
           {/* Premium Badge */}
-          <div style={{ position: 'absolute', top: '16px', right: '16px', backgroundColor: tierColors.premium.primary, color: 'white', fontSize: '12px', fontWeight: 'bold', padding: '4px 8px', borderRadius: '9999px' }}>
-            MOST POPULAR
-          </div>
+          {!hidePricing && (
+            <div style={{ position: 'absolute', top: '16px', right: '16px', backgroundColor: tierColors.premium.primary, color: 'white', fontSize: '12px', fontWeight: 'bold', padding: '4px 8px', borderRadius: '9999px' }}>
+              MOST POPULAR
+            </div>
+          )}
           
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
-            <div style={{ width: '64px', height: '64px', backgroundColor: tierColors.premium.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Crown style={{ width: '32px', height: '32px', color: 'white' }} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: hidePricing ? '32px' : '24px' }}>
+            <div style={{ width: hidePricing ? '80px' : '64px', height: hidePricing ? '80px' : '64px', backgroundColor: tierColors.premium.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Crown style={{ width: hidePricing ? '40px' : '32px', height: hidePricing ? '40px' : '32px', color: 'white' }} />
             </div>
           </div>
           
-          <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', marginBottom: '16px' }}>Premium Unlimited</h3>
+          <h3 style={{ fontSize: hidePricing ? '36px' : '24px', fontWeight: 'bold', color: 'white', marginBottom: hidePricing ? '32px' : '16px' }}>{hidePricing ? 'Premium' : 'Premium Unlimited'}</h3>
           
-          <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.premium.primary, marginBottom: '16px' }}>$15<span style={{ fontSize: '16px', fontWeight: 'normal', color: '#d1d5db' }}>/month</span></div>
-          
-          <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
-            <li style={{ marginBottom: '8px' }}>• Unlimited Premium Masters</li>
-            <li style={{ marginBottom: '8px' }}>• High-Quality WAV & FLAC Downloads</li>
-            <li style={{ marginBottom: '8px' }}>• All Advanced Features</li>
-            <li style={{ marginBottom: '8px' }}>• Priority Support</li>
-          </ul>
+          {!hidePricing && (
+            <>
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: tierColors.premium.primary, marginBottom: '16px' }}>$15<span style={{ fontSize: '16px', fontWeight: 'normal', color: '#d1d5db' }}>/month</span></div>
+              
+              <ul style={{ color: '#d1d5db', lineHeight: '1.8', textAlign: 'left', listStyle: 'none', padding: 0, marginBottom: '24px' }}>
+                <li style={{ marginBottom: '8px' }}>• Unlimited Premium Masters</li>
+                <li style={{ marginBottom: '8px' }}>• High-Quality WAV & FLAC Downloads</li>
+                <li style={{ marginBottom: '8px' }}>• All Advanced Features</li>
+                <li style={{ marginBottom: '8px' }}>• Priority Support</li>
+              </ul>
+            </>
+          )}
           
           <button style={{
             backgroundColor: tierColors.premium.primary,
             color: 'white',
             border: 'none',
-            padding: '12px 24px',
+            padding: hidePricing ? '16px 32px' : '12px 24px',
             borderRadius: '8px',
             fontWeight: '600',
             cursor: 'pointer',
             width: '100%',
+            fontSize: hidePricing ? '24px' : '16px',
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => { e.target.style.backgroundColor = tierColors.premium.secondary; }}
           onMouseLeave={(e) => { e.target.style.backgroundColor = tierColors.premium.primary; }}
           >
-            Subscribe Now
+            {hidePricing ? 'Select Premium' : 'Subscribe Now'}
           </button>
         </div>
       </div>

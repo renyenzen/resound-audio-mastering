@@ -2,7 +2,7 @@ import React from 'react';
 
 const Logo = ({ size = 120, showText = true, className = '' }) => {
   return (
-    <div className={`flex items-center ${className}`}>
+    <div style={{ display: 'flex', alignItems: 'center' }} className={className}>
       <svg
         width={size}
         height={size}
@@ -68,8 +68,8 @@ const Logo = ({ size = 120, showText = true, className = '' }) => {
       </svg>
       
       {showText && (
-        <div className="ml-3">
-          <h1 className="text-2xl font-bold text-white tracking-wide">
+        <div style={{ marginLeft: '12px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: 'white', letterSpacing: '0.05em' }}>
             RESOUND
           </h1>
         </div>

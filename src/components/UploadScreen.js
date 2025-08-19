@@ -33,7 +33,7 @@ const UploadScreen = ({ selectedTier, userSubscription, uploadedFile, onFileUplo
         : 'Process Premium (Preview - Sign Up to Download)';
     }
     
-    const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription;
+    const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription || { tier: 'free', freeDownloadsUsed: 0, maxFreeDownloads: 1 };
     const remainingFreeDownloads = maxFreeDownloads - freeDownloadsUsed;
     
     if (selectedTier === 'basic') {
@@ -182,7 +182,7 @@ const UploadScreen = ({ selectedTier, userSubscription, uploadedFile, onFileUplo
               </p>
             </div>
             <p style={{ fontSize: '14px', color: '#6b7280' }}>
-              Supports MP3, WAV, FLAC, and other audio formats
+              Supports MP3, WAV, and other audio formats (outputs WAV)
             </p>
           </div>
           

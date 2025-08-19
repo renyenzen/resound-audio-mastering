@@ -7,6 +7,9 @@ import PreviewScreen from './components/PreviewScreen';
 import Header from './components/Header';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import PaymentDemo from './components/PaymentDemo';
+import LandingPage from './components/LandingPage';
+import AudioProcessingFlow from './components/AudioProcessingFlow';
 import AudioProcessor from './utils/audioProcessor';
 
 // Protected Route Component
@@ -21,7 +24,7 @@ function AppContent() {
   const [selectedTier, setSelectedTier] = useState(null); // 'basic' or 'premium'
   const [uploadedFile, setUploadedFile] = useState(null);
   const [processedAudio, setProcessedAudio] = useState(null);
-  const { currentUser } = useAuth(); // Get current user from Firebase
+  const { currentUser, logout } = useAuth(); // Get current user from Firebase
   const [userSubscription, setUserSubscription] = useState({
     tier: 'free', // 'free', 'basic', 'premium'
     freeDownloadsUsed: 0, // Track free downloads used
@@ -101,14 +104,8 @@ function AppContent() {
   };
 
   const handleSignUp = () => {
-    // Simulate user sign up - in real app this would integrate with auth service
-    const newUser = {
-      id: Date.now(),
-      email: 'user@example.com',
-      name: 'New User'
-    };
-    setUser(newUser);
-    setIsAuthenticated(true);
+    // Redirect to signup page - Firebase handles authentication
+    // This is now handled by the Signup component
     // Reset free downloads for new user
     setUserSubscription(prev => ({
       ...prev,
@@ -116,19 +113,22 @@ function AppContent() {
     }));
   };
 
-  const handleSignOut = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    setUserSubscription({
-      tier: 'free',
-      freeDownloadsUsed: 0,
-      maxFreeDownloads: 1
-    });
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      setUserSubscription({
+        tier: 'free',
+        freeDownloadsUsed: 0,
+        maxFreeDownloads: 1
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleDownload = (tier) => {
     // Check if user is signed in first
-    if (!isAuthenticated) {
+    if (!currentUser) {
       const shouldSignUp = window.confirm(
         'You need to sign up to download tracks.\n\n' +
         'Sign up now to get 1 free basic enhanced track download!\n\n' +
@@ -183,7 +183,7 @@ function AppContent() {
   };
   
   const checkDownloadPermission = (tier) => {
-    const { tier: userTier, freeDownloadsUsed, maxFreeDownloads } = userSubscription;
+    const { tier: userTier, freeDownloadsUsed, maxFreeDownloads } = userSubscription || { tier: 'free', freeDownloadsUsed: 0, maxFreeDownloads: 1 };
     
     if (userTier === 'premium') {
       return { allowed: true, message: '' };
@@ -253,7 +253,7 @@ function AppContent() {
             onProcessTrack={handleProcessTrack}
             isProcessing={isProcessing}
             processingProgress={processingProgress}
-            isAuthenticated={isAuthenticated}
+            isAuthenticated={!!currentUser}
           />
         );
       case 'preview':
@@ -262,8 +262,8 @@ function AppContent() {
             processedAudio={processedAudio}
             userSubscription={userSubscription}
             selectedTier={selectedTier}
-            isAuthenticated={isAuthenticated}
-            user={user}
+            isAuthenticated={!!currentUser}
+            user={currentUser}
             onDownload={handleDownload}
             onProcessAnother={handleProcessAnother}
             onSignUp={handleSignUp}
@@ -276,16 +276,16 @@ function AppContent() {
 
   // Conversion banner logic
   const shouldShowBanner = () => {
-    const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription;
+    const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription || { tier: 'free', freeDownloadsUsed: 0, maxFreeDownloads: 1 };
     // Show banner for authenticated free users who used their downloads, or for anonymous users on preview
-    return (isAuthenticated && tier === 'free' && freeDownloadsUsed >= maxFreeDownloads) || 
-           (!isAuthenticated && appState === 'preview');
+    return (currentUser && tier === 'free' && freeDownloadsUsed >= maxFreeDownloads) || 
+           (!currentUser && appState === 'preview');
   };
 
   const ConversionBanner = () => {
     if (!shouldShowBanner()) return null;
     
-    const isAnonymous = !isAuthenticated;
+    const isAnonymous = !currentUser;
     const title = isAnonymous ? 'Ready to download your enhanced track?' : 'Enjoy unlimited downloads?';
     const subtitle = isAnonymous 
       ? 'Sign up now to get 1 free basic enhanced track download!' 
@@ -430,8 +430,11 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/payment-demo" element={<PaymentDemo />} />
+          <Route path="/upload" element={<AudioProcessingFlow />} />
           <Route 
             path="/dashboard" 
             element={
@@ -440,7 +443,6 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </Router>
     </AuthProvider>

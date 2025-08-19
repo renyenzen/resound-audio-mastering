@@ -32,25 +32,41 @@ const AudioPlayer = ({ title, src, isImproved = false, tierColors = null, audioI
   // Effect to handle exclusive playback
   useEffect(() => {
     if (currentlyPlaying !== audioId && isPlaying) {
-      // Another audio is playing, pause this one
-      if (audioRef.current) {
-        audioRef.current.pause();
+      // Another audio is playing, pause this one gracefully
+      if (audioRef.current && !audioRef.current.paused) {
+        try {
+          audioRef.current.pause();
+        } catch (error) {
+          // Ignore pause errors
+        }
         setIsPlaying(false);
       }
     }
   }, [currentlyPlaying, audioId, isPlaying]);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
         setIsPlaying(false);
         stopAudio();
       } else {
-        // Stop any other playing audio
-        playAudio(audioId);
-        audioRef.current.play();
-        setIsPlaying(true);
+        try {
+          // Stop any other playing audio first
+          playAudio(audioId);
+          // Wait a brief moment for other audio to stop
+          await new Promise(resolve => setTimeout(resolve, 10));
+          // Now play this audio
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (error) {
+          // Handle play interruption gracefully
+          if (error.name !== 'AbortError') {
+            console.warn('Audio play failed:', error);
+          }
+          setIsPlaying(false);
+          stopAudio();
+        }
       }
     }
   };
@@ -80,14 +96,24 @@ const AudioPlayer = ({ title, src, isImproved = false, tierColors = null, audioI
 
   const handleSeek = (e) => {
     if (audioRef.current) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      const newTime = percent * duration;
-      // Ensure seeking doesn't go beyond 60 seconds
-      const limitedTime = Math.min(newTime, 60);
-      audioRef.current.currentTime = limitedTime;
-      setCurrentTime(limitedTime);
+      try {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        const newTime = percent * duration;
+        // Ensure seeking doesn't go beyond 60 seconds
+        const limitedTime = Math.min(newTime, 60);
+        audioRef.current.currentTime = limitedTime;
+        setCurrentTime(limitedTime);
+      } catch (error) {
+        console.warn('Audio seek failed:', error);
+      }
     }
+  };
+
+  const handleAudioError = (e) => {
+    console.warn('Audio error occurred:', e.target.error);
+    setIsPlaying(false);
+    stopAudio();
   };
 
   const formatTime = (time) => {
@@ -216,6 +242,7 @@ const AudioPlayer = ({ title, src, isImproved = false, tierColors = null, audioI
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
+        onError={handleAudioError}
       />
     </div>
   );
@@ -223,7 +250,7 @@ const AudioPlayer = ({ title, src, isImproved = false, tierColors = null, audioI
 
 const PreviewScreen = ({ processedAudio, userSubscription, selectedTier, isAuthenticated, user, onDownload, onProcessAnother, onSignUp }) => {
   const isPremium = selectedTier === 'premium';
-  const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription;
+  const { tier, freeDownloadsUsed, maxFreeDownloads } = userSubscription || { tier: 'free', freeDownloadsUsed: 0, maxFreeDownloads: 1 };
   
   // Helper function to determine download button state and text
   const getDownloadButtonInfo = () => {
@@ -348,12 +375,12 @@ const PreviewScreen = ({ processedAudio, userSubscription, selectedTier, isAuthe
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
         <AudioPlayer 
           title="Original Track" 
-          src={processedAudio.original}
+          src={processedAudio.originalUrl}
           audioId="original"
         />
         <AudioPlayer 
           title={`${isPremium ? 'Premium' : 'Basic'} Enhanced Track`}
-          src={processedAudio.processed} 
+          src={processedAudio.processedUrl} 
           isImproved={true}
           tierColors={currentColors}
           audioId="enhanced"
