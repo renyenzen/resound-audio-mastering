@@ -113,7 +113,7 @@ const LandingPage = () => {
           
           {/* Call-to-Action Button */}
           <button 
-            onClick={() => handleTierSelect('free')}
+            onClick={() => navigate('/upload')}
             style={{
               backgroundColor: '#3b82f6',
               color: 'white',
